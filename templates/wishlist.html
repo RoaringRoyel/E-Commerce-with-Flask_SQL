@@ -1,0 +1,29 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>Your Wishlist</h1>
+
+{% if products %}
+    <ul>
+        {% for product in products %}
+        <li>
+            <div>
+                <h3>{{ product.name }}</h3>
+                <img src="{{ url_for('static', filename=product.image_url if product.image_url else 'uploads/default.jpg') }}" alt="{{ product.name }}" style="width:100px; height:100px;">
+                <p>Price: ${{ product.price }}</p>
+                <p>Brand: {{ product.brand }}</p>
+                <p>Description: {{ product.description or "No description available" }}</p>
+                <form action="{{ url_for('remove_from_wishlist', product_id=product.id) }}" method="POST">
+                    <button type="submit">Remove from Wishlist</button>
+                </form>
+                <form action="{{ url_for('add_to_cart', product_id=product.id) }}" method="POST">
+                    <button type="submit">Add to Cart</button>
+                </form>
+            </div>
+        </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>Your wishlist is empty.</p>
+{% endif %}
+{% endblock %}

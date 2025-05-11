@@ -1,0 +1,187 @@
+<!-- all_products.html -->
+
+{% extends 'base.html' %}
+
+{% block content %}
+<style>
+    /* Custom Styles for the All Products Page */
+    body {
+        background-color: #f8f9fa;
+        font-family: Arial, sans-serif;
+    }
+
+    .container {
+        max-width: 1200px;
+    }
+
+    .card {
+        border-radius: 10px;
+        overflow: hidden;
+        transition: box-shadow 0.3s ease;
+    }
+
+    .card:hover {
+        box-shadow: 0px 4px 10px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-title {
+        font-size: 1.1rem;
+        font-weight: bold;
+    }
+
+    .card-body {
+        padding: 1.2rem;
+    }
+
+    .card-img-top {
+        height: 200px;
+        object-fit: cover;
+    }
+
+    .pagination {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .pagination a, .pagination span {
+        text-decoration: none;
+        font-size: 1rem;
+        color: #007bff;
+        padding: 10px;
+        border-radius: 5px;
+    }
+
+    .pagination a:hover {
+        background-color: #f1f1f1;
+    }
+
+    .pagination span {
+        font-weight: bold;
+        color: #333;
+    }
+
+    .pagination a:disabled {
+        color: #ccc;
+        pointer-events: none;
+    }
+
+    .input-group {
+        max-width: 500px;
+    }
+
+    .input-group input {
+        border-radius: 0.25rem;
+    }
+
+    .form-select {
+        border-radius: 0.25rem;
+        margin-right: 10px;
+    }
+
+    .btn-primary, .btn-secondary {
+        border-radius: 0.25rem;
+    }
+</style>
+
+<div class="container my-5">
+    <!-- Search and Sort Form -->
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <form method="GET" action="{{ url_for('all_products') }}">
+                <div class="input-group">
+                    <input type="text" class="form-control" name="search" placeholder="Search for products" value="{{ search_query }}">
+                    <button class="btn btn-primary" type="submit">Search</button>
+                </div>
+            </form>
+        </div>
+        <div class="col-md-6 text-end">
+            <form method="GET" action="{{ url_for('all_products') }}" class="d-inline-block">
+                <select name="sort_by" class="form-select d-inline-block w-auto">
+                    <option value="price" {% if sort_by == 'price' %}selected{% endif %}>Price</option>
+                    <option value="seller" {% if sort_by == 'seller' %}selected{% endif %}>Seller</option>
+                    <option value="brand" {% if sort_by == 'brand' %}selected{% endif %}>Brand</option>
+                </select>
+                <select name="sort_order" class="form-select d-inline-block w-auto">
+                    <option value="asc" {% if sort_order == 'asc' %}selected{% endif %}>Ascending</option>
+                    <option value="desc" {% if sort_order == 'desc' %}selected{% endif %}>Descending</option>
+                </select>
+                <button class="btn btn-secondary d-inline-block ml-2" type="submit">Sort</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Product Listings -->
+    <div class="row">
+        {% for product in products %}
+        <div class="col-lg-3 col-md-4 col-sm-6 mb-4">
+            <div class="card shadow-sm border-light">
+                <img src="{{ url_for('static', filename=product.image_url if product.image_url else 'uploads/default.jpg') }}"
+         alt="{{ product.name }}"
+         style="width:300px; height:300px; object-fit:cover;">
+         <div class="card-body">
+                    <h5 class="card-title">{{ product.name }}</h5>
+                    <p class="card-text">{{ product.description[:100] }}...</p>
+                    <p class="text-muted">Brand: {{ product.brand }}</p>
+                    <p class="text-success">Price: ${{ product.price }}</p>
+                     <a href="{{ url_for('product_detail', product_id=product.id) }}">View Details</a>
+                </div>
+            </div>
+        </div>
+
+        <!-- Product Modal -->
+        <div class="modal fade" id="productModal{{ product.id }}" tabindex="-1" aria-labelledby="productModalLabel{{ product.id }}" aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="productModalLabel{{ product.id }}">{{ product.name }}</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row">
+                            <div class="col-md-6">
+                                <img src="{{ url_for('static', filename='uploads/' + (product.image_url if product.image_url else 'default.jpg')) }}" 
+     alt="{{ product.name }}" style="width: 50px; height: 50px; object-fit: cover;">
+
+                            </div>
+                            <div class="col-md-6">
+                                <p><strong>Description:</strong> {{ product.description }}</p>
+                                <p><strong>Price:</strong> ${{ product.price }}</p>
+                                <p><strong>Brand:</strong> {{ product.brand }}</p>
+                                <p><strong>Stock:</strong> {{ product.stock }} items available</p>
+                                <div class="d-flex">
+                                    <form action="{{ url_for('add_to_cart', product_id=product.id) }}" method="POST" class="me-2">
+                                        <button type="submit" class="btn btn-primary">Add to Cart</button>
+                                    </form>
+                                    <form action="{{ url_for('add_to_wishlist', product_id=product.id) }}" method="POST">
+                                        <button type="submit" class="btn btn-secondary">Add to Wishlist</button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Pagination -->
+    <div class="pagination">
+    {% if pagination.has_prev %}
+    <a href="{{ url_for('all_products', page=pagination.prev_num, search=search_query, sort_by=sort_by, sort_order=sort_order) }}" class="btn btn-outline-secondary">Previous</a>
+    {% endif %}
+    
+    <span>Page {{ pagination.page }} of {{ pagination.pages }}</span>
+    
+    {% if pagination.has_next %}
+    <a href="{{ url_for('all_products', page=pagination.next_num, search=search_query, sort_by=sort_by, sort_order=sort_order) }}" class="btn btn-outline-secondary">Next</a>
+    {% endif %}
+</div>
+
+</div>
+
+{% endblock %}

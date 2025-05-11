@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="product-detail-wrapper">
+    <h1>Add New Product</h1>
+    <form method="POST" enctype="multipart/form-data" action="{{ url_for('add_product') }}" class="text-left">
+        <div class="form-group">
+            <label for="name">Product Name:</label>
+            <input type="text" id="name" name="name" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label for="description">Description:</label>
+            <textarea id="description" name="description" class="form-control" rows="3" required></textarea>
+        </div>
+
+        <div class="form-group">
+            <label for="price">Price:</label>
+            <input type="number" id="price" name="price" step="0.01" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label for="image">Product Image:</label>
+            <input type="file" id="image" name="image" accept="image/*" class="form-control-file">
+        </div>
+
+        <div class="form-group">
+            <label for="size">Size:</label>
+            <select id="size" name="size" class="form-control" required>
+                <option value="">Select Size</option>
+                {% for s in range(38, 45) %}
+                <option value="{{ s }}">{{ s }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="category">Category:</label>
+            <select id="category" name="category" class="form-control" required>
+                <option value="">Select Category</option>
+                <option value="A">A</option>
+                <option value="B">B</option>
+                <option value="C">C</option>
+            </select>
+        </div>
+
+        <div class="form-group">
+            <label for="brand">Brand:</label>
+            <input type="text" id="brand" name="brand" class="form-control" required>
+        </div>
+
+        <div class="form-group">
+            <label for="stock">Stock Quantity:</label>
+            <input type="number" id="stock" name="stock" class="form-control" value="5" required>
+        </div>
+
+        <div class="form-group">
+            <label for="upload_time">Upload Date:</label>
+            <input type="date" id="upload_time" name="upload_time" class="form-control" required>
+        </div>
+
+        <button type="submit" class="btn">Add Product</button>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Admin Dashboard</title>
+  <style>
+    body {
+      font-family: 'Arial', sans-serif;
+      background: linear-gradient(135deg, #f0f2f5, #dfe6e9);
+      color: #333;
+      margin: 0;
+      padding: 0;
+    }
+
+    h1, h2 {
+      color: #2d3436;
+      text-align: center;
+      padding: 20px 0;
+      font-size: 2em;
+    }
+
+    table {
+      width: 80%;
+      margin: 0 auto;
+      border-collapse: collapse;
+      background: #ffffff;
+      border-radius: 10px;
+      box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    th, td {
+      padding: 15px;
+      text-align: left;
+      border-bottom: 1px solid #ddd;
+    }
+
+    th {
+      background-color: #2d3436;
+      color: #ffffff;
+    }
+
+    tr:hover {
+      background-color: #f6f6f6;
+    }
+
+    button {
+      padding: 10px 20px;
+      background-color: #3498db;
+      border: none;
+      color: #ffffff;
+      border-radius: 5px;
+      cursor: pointer;
+      font-size: 1em;
+      transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+      background-color: #2980b9;
+    }
+
+    button.reject {
+      background-color: #e74c3c;
+    }
+
+    button.reject:hover {
+      background-color: #c0392b;
+    }
+
+    .flash.success {
+      color: green;
+      background-color: #e9f7e9;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+
+    .flash.danger {
+      color: red;
+      background-color: #f8d7da;
+      padding: 10px;
+      border-radius: 5px;
+      margin-bottom: 20px;
+    }
+
+    .container {
+      width: 90%;
+      margin: 30px auto;
+    }
+
+    .section-title {
+      color: #2d3436;
+      font-size: 1.5em;
+      margin-top: 30px;
+      margin-bottom: 10px;
+    }
+
+    .stats-table th, .stats-table td {
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="container">
+    <h1>Admin Dashboard</h1>
+
+    <!-- Flash Messages -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        <ul>
+          {% for category, message in messages %}
+            <li class="flash {{ category }}">{{ message }}</li>
+          {% endfor %}
+        </ul>
+      {% endif %}
+    {% endwith %}
+
+    <!-- Pending Product Approvals -->
+    <div class="section-title">Pending Product Approvals</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Product Name</th>
+          <th>Description</th>
+          <th>Price</th>
+          <th>Status</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for product in pending_products %}
+          <tr>
+            <td>{{ product.name }}</td>
+            <td>{{ product.description }}</td>
+            <td>{{ product.price }}</td>
+            <td>{{ product.status }}</td>
+            <td>
+              <form action="{{ url_for('approve_product', product_id=product.id) }}" method="POST">
+                <button type="submit">Approve</button>
+              </form>
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="5">No pending products.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Warehouse Requests -->
+    <div class="section-title">Warehouse Requests</div>
+    <table>
+      <thead>
+        <tr>
+          <th>Product</th>
+          <th>Seller</th>
+          <th>Status</th>
+          <th>Requested On</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for req in warehouse_requests %}
+          <tr>
+            <td>{{ req.product.name }}</td>
+            <td>{{ req.seller.username }}</td>
+            <td>{{ req.status }}</td>
+            <td>{{ req.created_at.strftime('%Y-%m-%d') }}</td>
+            <td>
+              {% if req.status == 'Pending' %}
+                <form action="{{ url_for('approve_request', request_id=req.id) }}" method="POST" style="display:inline;">
+                  <button type="submit">Approve</button>
+                </form>
+                <form action="{{ url_for('reject_request', request_id=req.id) }}" method="POST" style="display:inline;">
+                  <button type="submit" class="reject">Reject</button>
+                </form>
+              {% else %}
+                <em>No actions available</em>
+              {% endif %}
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="5">No warehouse requests.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
+
+    <!-- Seller Stats & Rankings -->
+    <div class="section-title">Seller Stats & Rankings</div>
+    <table class="stats-table">
+      <thead>
+        <tr>
+          <th>Rank</th>
+          <th>Seller</th>
+          <th>Total Sales</th>
+          <th>Total Earnings</th>
+          <th>Total Reviews</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for stat in ranked_sellers %}
+          <tr>
+            <td>{{ loop.index }}</td>
+            <td>{{ stat.seller.username }}</td>
+            <td>{{ stat.total_sales }}</td>
+            <td>${{ "%.2f"|format(stat.total_earnings) }}</td>
+            <td>{{ stat.total_reviews }}</td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+
+</body>
+</html>

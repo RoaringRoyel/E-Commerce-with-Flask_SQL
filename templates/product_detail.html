@@ -1,0 +1,176 @@
+{% extends 'base.html' %}
+
+{% block content %}
+  <div class="product-detail-wrapper">
+    <div class="product-detail">
+      <h1>{{ product.name }}</h1>
+      
+      <div class="product-image-container">
+        <img src="{{ url_for('static', filename=product.image_url if product.image_url else 'uploads/default.jpg') }}"
+             alt="{{ product.name }}" class="product-image">
+      </div>
+      
+      <p><strong>Brand:</strong> {{ product.brand }}</p>
+      <p><strong>Price:</strong> ${{ product.price }}</p>
+      <p><strong>Description:</strong> {{ product.description or "No description provided." }}</p>
+      <p><strong>Seller:</strong> {{ product.owner.username if product.owner else "N/A" }}</p>
+      <p><strong>Stock:</strong> {{ product.stock }} items available</p>
+
+      <!-- Add to Wishlist -->
+      <form action="{{ url_for('add_to_wishlist', product_id=product.id) }}" method="POST">
+          <button type="submit" class="wishlist-btn btn btn-light">Add to Wishlist</button>
+      </form>
+
+      <!-- Add to Cart -->
+      <form action="{{ url_for('add_to_cart', product_id=product.id) }}" method="POST">
+          <button type="submit" class="cart-btn btn btn-light">Add to Cart</button>
+      </form>
+
+      <!-- Seller-Specific Features -->
+      {% if current_user.role == 'seller' and product.owner_id == current_user.id %}
+        <div class="seller-specific">
+          <form action="{{ url_for('product_detail', product_id=product.id) }}" method="POST">
+            <button type="submit" name="send_to_warehouse" class="send-to-warehouse-btn btn btn-outline-light">Request to Send to Warehouse</button>
+          </form>
+
+          <!-- Product Report -->
+          <div class="product-report">
+            <h3>Product Report</h3>
+            <div class="report-stats">
+              <p><strong>Average Rating:</strong> {{ avg_rating }}</p>
+
+              <h4>Reviews:</h4>
+              <ul>
+                {% for review in reviews_data %}
+                  <li>{{ review.comment }} - Rating: {{ review.rating }}/5</li>
+                {% endfor %}
+              </ul>
+
+              <h4>Total Sales:</h4>
+              <p>{{ total_sales }} completed orders</p>
+
+              <h4>Orders:</h4>
+              <ul>
+                {% for order in orders %}
+                  <li>Order ID: {{ order.id }} - Status: {{ order.status }} - Date: {{ order.created_at }}</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        </div>
+      {% endif %}
+    </div>
+  </div>
+
+{% endblock %}
+
+<style>
+  @import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@200;300;400;500;600;700&display=swap");
+
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: "Open Sans", sans-serif;
+  }
+
+  body {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    width: 100%;
+    padding: 0 10px;
+    background: url("{{ url_for('static', filename='hero-bg.jpg') }}") no-repeat center center fixed;
+    background-position: center;
+    background-size: cover;
+  }
+
+  .product-detail-wrapper {
+    width: 100%;
+    max-width: 900px;
+    padding: 40px;
+    border-radius: 10px;
+    text-align: center;
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border: 1px solid rgba(255, 255, 255, 0.4);
+    background: rgba(255, 255, 255, 0.2);
+    color: #fff;
+  }
+
+  .product-detail {
+    padding: 20px;
+  }
+
+  .product-image-container {
+    margin-bottom: 20px;
+  }
+
+  .product-image {
+    max-width: 100%;
+    height: auto;
+    border-radius: 8px;
+  }
+
+  h1 {
+    font-size: 2.5rem;
+    color: #fff;
+    margin-bottom: 20px;
+  }
+
+  p {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+  }
+
+  button {
+    background: #fff;
+    color: #000;
+    font-weight: 600;
+    border: none;
+    padding: 12px 20px;
+    cursor: pointer;
+    border-radius: 3px;
+    font-size: 16px;
+    border: 2px solid transparent;
+    transition: 0.3s ease;
+    margin: 10px;
+  }
+
+  button:hover {
+    color: #fff;
+    border-color: #fff;
+    background: rgba(255, 255, 255, 0.15);
+  }
+
+  .seller-specific {
+    margin-top: 30px;
+  }
+
+  .product-report {
+    margin-top: 20px;
+    text-align: left;
+  }
+
+  .report-stats p,
+  .report-stats ul {
+    font-size: 1rem;
+    color: #fff;
+  }
+
+  .product-report h3 {
+    color: #fff;
+    margin-bottom: 10px;
+  }
+
+  .product-report h4 {
+    margin-top: 15px;
+    color: #fff;
+  }
+
+  .product-report ul {
+    list-style-type: none;
+    padding-left: 0;
+  }
+</style>
