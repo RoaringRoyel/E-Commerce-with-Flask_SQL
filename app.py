@@ -177,17 +177,18 @@ def seller_dashboard():
     current_year = datetime.utcnow().year
 
     monthly_data = (
-        db.session.query(func.sum(Order.total_price), func.count(Order.id))
-        .join(OrderItem)
-        .join(Product)
-        .filter(
-            Product.owner_id == current_user.id,
-            Order.status == 'delivered',
-            extract('month', Order.order_date) == current_month,
-            extract('year', Order.order_date) == current_year
-        )
-        .first()
+    db.session.query(func.sum(OrderItem.total_price), func.count(OrderItem.id))
+    .join(Order)
+    .join(Product)
+    .filter(
+        Product.owner_id == current_user.id,
+        Order.status == 'delivered',
+        extract('month', Order.order_date) == current_month,
+        extract('year', Order.order_date) == current_year
     )
+    .first()
+    )
+
 
     monthly_earning = monthly_data[0] or 0
     monthly_sales_count = monthly_data[1] or 0
@@ -199,30 +200,6 @@ def seller_dashboard():
         monthly_earning=monthly_earning,
         monthly_sales_count=monthly_sales_count
     )
-
-@app.route('/update_order/<int:order_id>', methods=['POST'])
-@login_required
-def update_order(order_id):
-    order = Order.query.get_or_404(order_id)
-
-    # Only the seller can confirm or cancel the order
-    if current_user.role != 'seller' or order.product.owner_id != current_user.id:
-        flash('You are not authorized to perform this action.', 'danger')
-        return redirect(url_for('dashboard'))
-
-    action = request.form.get('action')
-
-    if action == 'confirm':
-        order.status = 'confirmed'  # Update the status to confirmed
-        flash(f'Order {order.id} has been confirmed!', 'success')
-    elif action == 'cancel':
-        order.status = 'cancelled'  # Update the status to cancelled
-        flash(f'Order {order.id} has been cancelled.', 'danger')
-
-    db.session.commit()
-    return redirect(url_for('dashboard'))  # Redirect back to the dashboard
-
-
 
 @app.route('/seller/inventory_permission', methods=['GET'])
 @login_required
@@ -310,20 +287,23 @@ def admin_dashboard():
         flash('Access denied! You must be an admin.', 'danger')
         return redirect(url_for('home'))
 
-    # Pending products
     pending_products = Product.query.filter_by(status='pending').all()
-
-    # All sellers
     sellers = User.query.filter_by(role='seller').all()
 
-    # Seller statistics
     seller_stats = []
     for seller in sellers:
-        seller_orders = Order.query.join(Product).filter(Product.owner_id == seller.id).all()
-        total_sales = sum(order.quantity for order in seller_orders)
-        total_earnings = sum(order.total_price for order in seller_orders)
+        # Get all order items where the product belongs to this seller
+        seller_order_items = (
+            OrderItem.query
+            .join(Product, OrderItem.product_id == Product.id)
+            .join(Order, OrderItem.order_id == Order.id)
+            .filter(Product.owner_id == seller.id, Order.status == 'delivered')
+            .all()
+        )
 
-        # All products by this seller
+        total_sales = sum(item.quantity for item in seller_order_items)
+        total_earnings = sum(item.total_price for item in seller_order_items)
+
         seller_products = Product.query.filter_by(owner_id=seller.id).all()
         total_reviews = sum(product.review_count for product in seller_products)
 
@@ -334,17 +314,56 @@ def admin_dashboard():
             'total_reviews': total_reviews
         })
 
-    # Rank sellers by total sales
     ranked_sellers = sorted(seller_stats, key=lambda x: x['total_sales'], reverse=True)
 
-    # Warehouse product requests
     warehouse_requests = WarehouseRequest.query.filter_by(status='Pending').all()
+    pending_orders = Order.query.filter_by(status='pending').all()
 
     return render_template('admin_dashboard.html',
                            pending_products=pending_products,
                            sellers=sellers,
                            ranked_sellers=ranked_sellers,
-                           warehouse_requests=warehouse_requests)
+                           warehouse_requests=warehouse_requests,
+                           pending_orders=pending_orders)
+
+
+@app.route('/admin/confirm_order/<int:order_id>', methods=['POST'])
+@login_required
+def confirm_order(order_id):
+    if current_user.role != 'owner':
+        flash('Access denied! Admins only.', 'danger')
+        return redirect(url_for('home'))
+
+    order = Order.query.get_or_404(order_id)
+    if order.status == 'pending':
+        order.status = 'delivered'
+        db.session.commit()
+        flash(f'Order #{order.id} confirmed as delivered.', 'success')
+    else:
+        flash('Order is not pending.', 'warning')
+
+    return redirect(url_for('admin_dashboard'))
+
+
+@app.route('/admin/cancel_order/<int:order_id>', methods=['POST'])
+@login_required
+def cancel_order(order_id):
+    if current_user.role != 'owner':
+        flash('Access denied! Admins only.', 'danger')
+        return redirect(url_for('home'))
+
+    order = Order.query.get_or_404(order_id)
+    if order.status == 'pending':
+        for item in order.items:
+            item.product.stock += item.quantity
+        order.status = 'cancelled'
+        db.session.commit()
+        flash(f'Order #{order.id} has been cancelled. Inventory updated.', 'danger')
+    else:
+        flash('Order is not pending.', 'warning')
+
+    return redirect(url_for('admin_dashboard'))
+
 
 @app.route('/admin/approve/<int:product_id>', methods=['POST'])
 @login_required

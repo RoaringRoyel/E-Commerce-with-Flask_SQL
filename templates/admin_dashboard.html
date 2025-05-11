@@ -185,6 +185,47 @@
       </tbody>
     </table>
 
+    <div class="section-title">Pending Orders</div>
+<table>
+  <thead>
+    <tr>
+      <th>Order ID</th>
+      <th>Buyer</th>
+      <th>Items</th>
+      <th>Total Price</th>
+      <th>Date</th>
+      <th>Actions</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for order in pending_orders %}
+      <tr>
+        <td>{{ order.id }}</td>
+        <td>{{ order.buyer.username }}</td>
+        <td>
+          <ul>
+            {% for item in order.items %}
+              <li>{{ item.product.name }} (x{{ item.quantity }})</li>
+            {% endfor %}
+          </ul>
+        </td>
+        <td>${{ "%.2f"|format(order.total_price) }}</td>
+        <td>{{ order.order_date.strftime('%Y-%m-%d') }}</td>
+        <td>
+          <form action="{{ url_for('confirm_order', order_id=order.id) }}" method="POST" style="display:inline;">
+            <button type="submit">Confirm</button>
+          </form>
+          <form action="{{ url_for('cancel_order', order_id=order.id) }}" method="POST" style="display:inline;">
+            <button type="submit" class="reject" onclick="return confirm('Cancel this order?')">Cancel</button>
+          </form>
+        </td>
+      </tr>
+    {% else %}
+      <tr><td colspan="6">No pending orders.</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+
     <!-- Seller Stats & Rankings -->
     <div class="section-title">Seller Stats & Rankings</div>
     <table class="stats-table">

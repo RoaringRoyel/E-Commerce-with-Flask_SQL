@@ -184,56 +184,6 @@
     </div>
 
     <div class="section">
-        <h3>Your Pending Orders</h3>
-        {% if orders %}
-            <ul>
-                {% for order in orders %}
-                    {% if order.status == 'pending' %}
-                        <li>
-                            <strong>Order ID:</strong> {{ order.id }} — 
-                            <strong>Product:</strong> 
-                            {% if order.product %}
-                                {{ order.product.name }} 
-                            {% else %}
-                                Product info not available
-                            {% endif %} — 
-                            <strong>Qty:</strong> {{ order.quantity }} — 
-                            <strong>Status:</strong> {{ order.status }} — 
-                            <form action="{{ url_for('update_order', order_id=order.id) }}" method="POST" style="display:inline;">
-                                <button type="submit" name="action" value="confirm" class="btn btn-success">Confirm</button>
-                                <button type="submit" name="action" value="cancel" class="btn btn-danger">Cancel</button>
-                            </form>
-                        </li>
-                    {% endif %}
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>No pending orders.</p>
-        {% endif %}
-    </div>
-    
-    <div class="section">
-        <h3>Your Confirmed Orders</h3>
-        {% if confirmed_orders %}
-            <ul>
-                {% for order in confirmed_orders %}
-                    <li>
-                        <strong>Order ID:</strong> {{ order.id }} — 
-                        <strong>Product:</strong> 
-                        {% if order.product %}
-                            {{ order.product.name }} 
-                        {% else %}
-                            Product info not available
-                        {% endif %} — 
-                        <strong>Qty:</strong> {{ order.quantity }} — 
-                        <strong>Status:</strong> {{ order.status }}
-                    </li>
-                {% endfor %}
-            </ul>
-        {% else %}
-            <p>No confirmed orders.</p>
-        {% endif %}
-    </div>
     
     
     <div class="section">
