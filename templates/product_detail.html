@@ -1,8 +1,8 @@
 {% extends 'base.html' %}
 
 {% block content %}
-  <div class="product-detail-wrapper">
-    <div class="product-detail">
+  <div class="product-detail-wrapper navbar-dark">
+    <div class="product-detail navbar-dark">
       <h1>{{ product.name }}</h1>
       
       <div class="product-image-container">
@@ -85,7 +85,6 @@
     width: 100%;
     padding: 0 10px;
     background: url("{{ url_for('static', filename='hero-bg.jpg') }}") no-repeat center center fixed;
-    background-position: center;
     background-size: cover;
   }
 
@@ -93,13 +92,13 @@
     width: 100%;
     max-width: 900px;
     padding: 40px;
-    border-radius: 10px;
+    border-radius: 12px;
     text-align: center;
-    backdrop-filter: blur(12px);
-    -webkit-backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.4);
-    background: rgba(255, 255, 255, 0.2);
-    color: #fff;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    background: rgba(30, 30, 30, 0.6); /* darker for better contrast */
+    border: 1px solid rgba(130, 130, 220, 0.3);
+    color: #f1f1f1;
   }
 
   .product-detail {
@@ -114,37 +113,57 @@
     max-width: 100%;
     height: auto;
     border-radius: 8px;
+    box-shadow: 0 0 10px rgba(255, 255, 255, 0.1);
   }
 
   h1 {
     font-size: 2.5rem;
-    color: #fff;
+    color: #ffffff;
     margin-bottom: 20px;
   }
 
   p {
     font-size: 1.1rem;
     margin-bottom: 10px;
+    color: #095830;
+  }
+
+  a {
+    color: #1b8632;
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
   }
 
   button {
-    background: #fff;
-    color: #000;
+    background: rgba(255, 255, 255, 0.1);
+    color: #3d2fa6;
     font-weight: 600;
-    border: none;
+    border: 2px solid rgba(255, 255, 255, 0.3);
     padding: 12px 20px;
     cursor: pointer;
-    border-radius: 3px;
+    border-radius: 6px;
     font-size: 16px;
-    border: 2px solid transparent;
-    transition: 0.3s ease;
     margin: 10px;
+    transition: background 0.3s ease, color 0.3s ease;
   }
 
   button:hover {
-    color: #fff;
-    border-color: #fff;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.25);
+    color: #000;
+  }
+
+  .btn-outline-light {
+    background: transparent;
+    color: #932a2a;
+    border: 2px solid #ffffff;
+  }
+
+  .btn-outline-light:hover {
+    background: #ffffff;
+    color: #000;
   }
 
   .seller-specific {
@@ -159,21 +178,18 @@
   .report-stats p,
   .report-stats ul {
     font-size: 1rem;
-    color: #fff;
+    color: #701717;
   }
 
-  .product-report h3 {
-    color: #fff;
-    margin-bottom: 10px;
-  }
-
+  .product-report h3,
   .product-report h4 {
-    margin-top: 15px;
-    color: #fff;
+    color: #240e0e;
+    margin-top: 10px;
   }
 
   .product-report ul {
     list-style-type: none;
     padding-left: 0;
   }
+
 </style>
