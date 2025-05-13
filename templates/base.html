@@ -40,6 +40,100 @@
     text-shadow: 2px 2px 5px black; /* Horizontal offset, vertical offset, blur radius, and color */
 }
 
+/* Glassmorphism Background */
+body {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    background-color: rgba(255, 255, 255, 0.05);
+    color: #fff;
+}
+
+/* Profile Card */
+.profile-card {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 20px;
+    border-radius: 15px;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+    margin-bottom: 30px;
+}
+
+/* Form Styling */
+.form-group {
+    margin-bottom: 20px;
+}
+
+.form-control {
+  background-color: rgba(0, 0, 0, 0.3);
+  border: 1px solid rgba(255, 255, 255, 0.6);
+    color: #fff;
+    border-radius: 8px;
+    padding: 10px;
+    transition: all 0.3s ease;
+}
+
+.form-control:focus {
+    border-color: #007bff;
+    outline: none;
+    box-shadow: 0 0 5px rgba(0, 123, 255, 0.5);
+}
+
+/* Button Styling */
+.btn-update {
+    background: linear-gradient(90deg, #ff7e5f, #feb47b);
+    border: none;
+    padding: 12px 20px;
+    border-radius: 30px;
+    color: #fff;
+    transition: all 0.3s ease;
+}
+
+.btn-update:hover {
+    background: linear-gradient(90deg, #feb47b, #ff7e5f);
+    cursor: pointer;
+}
+
+/* Orders Section */
+.orders-section {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 20px;
+    border-radius: 15px;
+    backdrop-filter: blur(15px);
+    -webkit-backdrop-filter: blur(15px);
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+}
+
+.order-list {
+    margin-top: 20px;
+}
+
+.order-item {
+    background: rgba(255, 255, 255, 0.1);
+    padding: 15px;
+    border-radius: 10px;
+    margin-bottom: 15px;
+}
+
+.order-item-detail {
+    margin-bottom: 10px;
+    color: #ddd;
+}
+
+.status {
+    font-weight: bold;
+    color: #ff5722;
+}
+
+/* Profile Image */
+.profile-img {
+    width: 150px;
+    border-radius: 50%;
+    margin-bottom: 10px;
+}
+
+
     </style>
     {% block head %}{% endblock %}
 </head>

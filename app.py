@@ -797,35 +797,42 @@ def update_product(product_id):
 
 from werkzeug.utils import secure_filename
 
+
+
 @app.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
     if request.method == 'POST':
-        # Update user info
-        current_user.first_name = request.form['first_name']
-        current_user.last_name = request.form['last_name']
-        current_user.username = request.form['username']
-        current_user.email = request.form['email']
+        # Handle profile updates (e.g., profile picture, name, email, etc.)
+        pass
 
-        # Optional: Handle profile picture upload
-        file = request.files.get('profile_picture')
-        if file and allowed_file(file.filename):
-            filename = secure_filename(file.filename)
-            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
-            os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
-            file.save(filepath)
-            current_user.profile_picture = f'uploads/{filename}'
+    # Fetch the user's orders with order items
+    orders = Order.query.filter_by(buyer_id=current_user.id).all()
+    
+    order_details = []
+    for order in orders:
+        items = OrderItem.query.filter_by(order_id=order.id).all()
+        order_item_details = []
+        
+        for item in items:
+            product = Product.query.get(item.product_id)
+            order_item_details.append({
+                'product_name': product.name,
+                'product_description': product.description,
+                'product_price': product.price,
+                'quantity': item.quantity,
+                'total_price': item.total_price,
+            })
+        
+        order_details.append({
+            'order_id': order.id,
+            'order_date': order.order_date,
+            'status': order.status,
+            'total_price': order.total_price,
+            'items': order_item_details
+        })
 
-        try:
-            db.session.commit()
-            flash('Profile updated successfully!', 'success')
-        except Exception as e:
-            db.session.rollback()
-            flash(f'Error updating profile: {e}', 'danger')
-
-        return redirect(url_for('profile'))
-
-    return render_template('profile.html', user=current_user)
-
+    return render_template('profile.html', user=current_user, order_details=order_details)
+    
 if __name__ == '__main__':
     app.run(debug=True)
