@@ -61,7 +61,7 @@
                     {% elif current_user.role == 'seller' %}
                         <li class="nav-item"><a class="nav-link" href="{{ url_for('seller_dashboard') }}">Seller Dashboard</a></li>
                     {% endif %}
-                    <li class="nav-item"><a class="nav-link" href="{{ url_for('auction_page') }}">Auction</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('wishlist_cart') }}">Cart & Wishlist</a></li>
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Logout</a></li>
                 {% else %}
                     <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Login</a></li>

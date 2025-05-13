@@ -763,6 +763,69 @@ def buy_all():
     db.session.commit()
     flash('All items purchased successfully!', 'success')
     return redirect(url_for('wishlist_cart'))
+@app.route('/product/<int:product_id>/update', methods=['GET', 'POST'])
+@login_required
+def update_product(product_id):
+    product = Product.query.get_or_404(product_id)
+
+    # Only allow the owner to update
+    if current_user.id != product.owner_id:
+        flash('Unauthorized access', 'danger')
+        return redirect(url_for('product_detail', product_id=product.id))
+
+    if request.method == 'POST':
+        # Basic fields
+        product.name = request.form['name']
+        product.brand = request.form['brand']
+        product.price = float(request.form['price'])
+        product.stock = int(request.form['stock'])
+        product.description = request.form['description']
+
+        # Image (optional)
+        image = request.files.get('image')
+        if image and image.filename != '':
+            filename = secure_filename(image.filename)
+            image_path = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            image.save(image_path)
+            product.image_url = f"uploads/{filename}"
+
+        db.session.commit()
+        flash('Product updated successfully!', 'success')
+        return redirect(url_for('product_detail', product_id=product.id))
+
+    return render_template('update_product.html', product=product)
+
+from werkzeug.utils import secure_filename
+
+@app.route('/profile', methods=['GET', 'POST'])
+@login_required
+def profile():
+    if request.method == 'POST':
+        # Update user info
+        current_user.first_name = request.form['first_name']
+        current_user.last_name = request.form['last_name']
+        current_user.username = request.form['username']
+        current_user.email = request.form['email']
+
+        # Optional: Handle profile picture upload
+        file = request.files.get('profile_picture')
+        if file and allowed_file(file.filename):
+            filename = secure_filename(file.filename)
+            filepath = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+            os.makedirs(app.config['UPLOAD_FOLDER'], exist_ok=True)
+            file.save(filepath)
+            current_user.profile_picture = f'uploads/{filename}'
+
+        try:
+            db.session.commit()
+            flash('Profile updated successfully!', 'success')
+        except Exception as e:
+            db.session.rollback()
+            flash(f'Error updating profile: {e}', 'danger')
+
+        return redirect(url_for('profile'))
+
+    return render_template('profile.html', user=current_user)
 
 if __name__ == '__main__':
     app.run(debug=True)

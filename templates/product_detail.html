@@ -33,6 +33,9 @@
             <button type="submit" name="send_to_warehouse" class="send-to-warehouse-btn btn btn-outline-light">Request to Send to Warehouse</button>
           </form>
 
+          <!-- Update Product (Visible Only to Owner) -->
+<a href="{{ url_for('update_product', product_id=product.id) }}" class="btn btn-outline-light">Update Product</a>
+
           <!-- Product Report -->
           <div class="product-report">
             <h3>Product Report</h3>

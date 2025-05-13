@@ -5,98 +5,143 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Admin Dashboard</title>
   <style>
+    /* Global Styles */
     body {
-      font-family: 'Arial', sans-serif;
-      background: linear-gradient(135deg, #f0f2f5, #dfe6e9);
-      color: #333;
-      margin: 0;
-      padding: 0;
+        font-family: 'Arial', sans-serif;
+        background: linear-gradient(135deg, #f0f2f5, #dfe6e9);
+        color: #333;
+        margin: 0;
+        padding: 0;
     }
 
     h1, h2 {
-      color: #2d3436;
-      text-align: center;
-      padding: 20px 0;
-      font-size: 2em;
+        color: #2d3436;
+        text-align: center;
+        padding: 20px 0;
+        font-size: 2em;
     }
 
-    table {
-      width: 80%;
-      margin: 0 auto;
-      border-collapse: collapse;
-      background: #ffffff;
-      border-radius: 10px;
-      box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.1);
-    }
-
-    th, td {
-      padding: 15px;
-      text-align: left;
-      border-bottom: 1px solid #ddd;
-    }
-
-    th {
-      background-color: #2d3436;
-      color: #ffffff;
-    }
-
-    tr:hover {
-      background-color: #f6f6f6;
-    }
-
-    button {
-      padding: 10px 20px;
-      background-color: #3498db;
-      border: none;
-      color: #ffffff;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 1em;
-      transition: background-color 0.3s ease;
-    }
-
-    button:hover {
-      background-color: #2980b9;
-    }
-
-    button.reject {
-      background-color: #e74c3c;
-    }
-
-    button.reject:hover {
-      background-color: #c0392b;
-    }
-
+    /* Flash Messages */
     .flash.success {
-      color: green;
-      background-color: #e9f7e9;
-      padding: 10px;
-      border-radius: 5px;
-      margin-bottom: 20px;
+        color: green;
+        background-color: #e9f7e9;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 20px;
     }
 
     .flash.danger {
-      color: red;
-      background-color: #f8d7da;
-      padding: 10px;
-      border-radius: 5px;
-      margin-bottom: 20px;
+        color: red;
+        background-color: #f8d7da;
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 20px;
     }
 
+    /* Container */
     .container {
-      width: 90%;
-      margin: 30px auto;
+        width: 90%;
+        margin: 30px auto;
     }
 
+    /* Section Titles */
     .section-title {
-      color: #2d3436;
-      font-size: 1.5em;
-      margin-top: 30px;
-      margin-bottom: 10px;
+        color: #2d3436;
+        font-size: 1.5em;
+        margin-top: 30px;
+        margin-bottom: 10px;
     }
 
+    /* Tables */
+    table {
+        width: 80%;
+        margin: 0 auto;
+        border-collapse: collapse;
+        background: #ffffff;
+        border-radius: 10px;
+        box-shadow: 0px 10px 15px rgba(0, 0, 0, 0.1);
+    }
+
+    th, td {
+        padding: 15px;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #2d3436;
+        color: #ffffff;
+    }
+
+    tr:hover {
+        background-color: #f6f6f6;
+    }
+
+    /* Buttons */
+    button {
+        padding: 10px 20px;
+        background-color: #3498db;
+        border: none;
+        color: #ffffff;
+        border-radius: 5px;
+        cursor: pointer;
+        font-size: 1em;
+        transition: background-color 0.3s ease;
+    }
+
+    button:hover {
+        background-color: #2980b9;
+    }
+
+    button.reject {
+        background-color: #e74c3c;
+    }
+
+    button.reject:hover {
+        background-color: #c0392b;
+    }
+
+    /* Glassmorphism Effect */
+    .glass-container {
+        backdrop-filter: blur(10px);
+        background: rgba(255, 255, 255, 0.1);
+        border: 1px solid rgba(255, 255, 255, 0.2);
+        border-radius: 15px;
+        padding: 20px;
+        box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+    }
+
+    nav.navbar {
+        backdrop-filter: blur(8px);
+        background: rgba(255, 255, 255, 0.2);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    /* Navbar Links */
+    .nav-link {
+        color: #fff !important;
+        font-weight: 500;
+    }
+
+    .nav-link:hover {
+        text-decoration: underline;
+    }
+
+    /* Seller Stats Table */
     .stats-table th, .stats-table td {
-      text-align: center;
+        text-align: center;
+    }
+
+    /* Responsive Styling */
+    @media (max-width: 768px) {
+        table {
+            width: 100%;
+        }
+        
+        .container {
+            width: 100%;
+            padding: 10px;
+        }
     }
   </style>
 </head>
@@ -186,45 +231,45 @@
     </table>
 
     <div class="section-title">Pending Orders</div>
-<table>
-  <thead>
-    <tr>
-      <th>Order ID</th>
-      <th>Buyer</th>
-      <th>Items</th>
-      <th>Total Price</th>
-      <th>Date</th>
-      <th>Actions</th>
-    </tr>
-  </thead>
-  <tbody>
-    {% for order in pending_orders %}
-      <tr>
-        <td>{{ order.id }}</td>
-        <td>{{ order.buyer.username }}</td>
-        <td>
-          <ul>
-            {% for item in order.items %}
-              <li>{{ item.product.name }} (x{{ item.quantity }})</li>
-            {% endfor %}
-          </ul>
-        </td>
-        <td>${{ "%.2f"|format(order.total_price) }}</td>
-        <td>{{ order.order_date.strftime('%Y-%m-%d') }}</td>
-        <td>
-          <form action="{{ url_for('confirm_order', order_id=order.id) }}" method="POST" style="display:inline;">
-            <button type="submit">Confirm</button>
-          </form>
-          <form action="{{ url_for('cancel_order', order_id=order.id) }}" method="POST" style="display:inline;">
-            <button type="submit" class="reject" onclick="return confirm('Cancel this order?')">Cancel</button>
-          </form>
-        </td>
-      </tr>
-    {% else %}
-      <tr><td colspan="6">No pending orders.</td></tr>
-    {% endfor %}
-  </tbody>
-</table>
+    <table>
+      <thead>
+        <tr>
+          <th>Order ID</th>
+          <th>Buyer</th>
+          <th>Items</th>
+          <th>Total Price</th>
+          <th>Date</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for order in pending_orders %}
+          <tr>
+            <td>{{ order.id }}</td>
+            <td>{{ order.buyer.username }}</td>
+            <td>
+              <ul>
+                {% for item in order.items %}
+                  <li>{{ item.product.name }} (x{{ item.quantity }})</li>
+                {% endfor %}
+              </ul>
+            </td>
+            <td>${{ "%.2f"|format(order.total_price) }}</td>
+            <td>{{ order.order_date.strftime('%Y-%m-%d') }}</td>
+            <td>
+              <form action="{{ url_for('confirm_order', order_id=order.id) }}" method="POST" style="display:inline;">
+                <button type="submit">Confirm</button>
+              </form>
+              <form action="{{ url_for('cancel_order', order_id=order.id) }}" method="POST" style="display:inline;">
+                <button type="submit" class="reject" onclick="return confirm('Cancel this order?')">Cancel</button>
+              </form>
+            </td>
+          </tr>
+        {% else %}
+          <tr><td colspan="6">No pending orders.</td></tr>
+        {% endfor %}
+      </tbody>
+    </table>
 
     <!-- Seller Stats & Rankings -->
     <div class="section-title">Seller Stats & Rankings</div>
