@@ -811,22 +811,37 @@ def profile():
         # Retrieve form data
         first_name = request.form.get('first_name')
         last_name = request.form.get('last_name')
+        username = request.form.get('username')
         email = request.form.get('email')
+        address = request.form.get('address')
+        contact_number = request.form.get('contact_number')
+        password = request.form.get('password')
+        confirm_password = request.form.get('confirm_password')
         profile_picture = request.files.get('profile_picture')
 
-        # Update user's information
+        # Update user fields
         current_user.first_name = first_name
         current_user.last_name = last_name
+        current_user.username = username
         current_user.email = email
+        current_user.address = address
+        current_user.contact_number = contact_number
 
-        # Handle profile picture upload if provided
+        # Handle password update (only if both fields are filled and match)
+        if password:
+            if password == confirm_password:
+                current_user.password = generate_password_hash(password)
+            else:
+                flash("Passwords do not match.", "danger")
+                return redirect(url_for('profile'))
+
+        # Handle profile picture upload
         if profile_picture and allowed_file(profile_picture.filename):
             filename = secure_filename(profile_picture.filename)
             profile_picture_url = f'uploads/{filename}'
             profile_picture.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
             current_user.profile_picture = profile_picture_url
 
-        # Commit changes to the database
         db.session.commit()
         flash('Profile updated successfully!', 'success')
         return redirect(url_for('profile'))

@@ -11,24 +11,53 @@
                 {% endif %}
                 <input type="file" name="profile_picture" class="form-control-file">
             </div>
+        
             <div class="form-group">
                 <label>First Name</label>
                 <input name="first_name" class="form-control" value="{{ user.first_name }}">
             </div>
+        
             <div class="form-group">
                 <label>Last Name</label>
                 <input name="last_name" class="form-control" value="{{ user.last_name }}">
             </div>
+        
             <div class="form-group">
                 <label>Username</label>
                 <input name="username" class="form-control" value="{{ user.username }}">
             </div>
+        
             <div class="form-group">
                 <label>Email</label>
                 <input name="email" class="form-control" value="{{ user.email }}">
             </div>
+        
+            <div class="form-group">
+                <label>Address</label>
+                <input name="address" class="form-control" value="{{ user.address or '' }}">
+            </div>
+        
+            <div class="form-group">
+                <label>Contact Number</label>
+                <input name="contact_number" class="form-control" value="{{ user.contact_number or '' }}">
+            </div>
+        
+            <div class="form-group">
+                <label>New Password</label>
+                <input name="password" type="password" class="form-control">
+            </div>
+        
+            <div class="form-group">
+                <label>Confirm New Password</label>
+                <input name="confirm_password" type="password" class="form-control">
+            </div>
+        
             <button class="btn btn-primary btn-update">Update</button>
         </form>
+        {% if message %}
+            <div class="alert alert-info mt-3">{{ message }}</div>
+        {% endif %}
+        
     </div>
 
     <hr>
