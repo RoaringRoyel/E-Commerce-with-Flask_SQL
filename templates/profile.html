@@ -75,7 +75,7 @@
 
                         <h6>Items:</h6>
                         <ul class="order-items-list">
-                            {% for item in order.items %}
+                            {% for item in order['items'] %}
                                 <li class="order-item-detail">
                                     <strong>{{ item.product_name }}</strong><br>
                                     <small>{{ item.product_description }}</small><br>
