@@ -798,13 +798,38 @@ def update_product(product_id):
 from werkzeug.utils import secure_filename
 
 
+from werkzeug.utils import secure_filename
+import os
+
+# Define a folder for saving profile pictures (make sure it's created)
+PROFILE_PIC_FOLDER = 'static/profile_pics'
 
 @app.route('/profile', methods=['GET', 'POST'])
 @login_required
 def profile():
     if request.method == 'POST':
-        # Handle profile updates (e.g., profile picture, name, email, etc.)
-        pass
+        # Retrieve form data
+        first_name = request.form.get('first_name')
+        last_name = request.form.get('last_name')
+        email = request.form.get('email')
+        profile_picture = request.files.get('profile_picture')
+
+        # Update user's information
+        current_user.first_name = first_name
+        current_user.last_name = last_name
+        current_user.email = email
+
+        # Handle profile picture upload if provided
+        if profile_picture and allowed_file(profile_picture.filename):
+            filename = secure_filename(profile_picture.filename)
+            profile_picture_url = f'uploads/{filename}'
+            profile_picture.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
+            current_user.profile_picture = profile_picture_url
+
+        # Commit changes to the database
+        db.session.commit()
+        flash('Profile updated successfully!', 'success')
+        return redirect(url_for('profile'))
 
     # Fetch the user's orders with order items
     orders = Order.query.filter_by(buyer_id=current_user.id).all()
@@ -833,6 +858,7 @@ def profile():
         })
 
     return render_template('profile.html', user=current_user, order_details=order_details)
-    
+
+
 if __name__ == '__main__':
     app.run(debug=True)
