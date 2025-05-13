@@ -87,15 +87,58 @@ def register():
 
     return render_template('register.html')
 
-
-
 @app.route('/')
 def home():
     try:
-        return render_template('index.html')
+        # Initialize variables for users who are not logged in
+        current_user_data = None
+        user_role = None
+        is_premium = None
+        membership_status = None
+        profile_picture = "default-profile-picture.jpg"  # Default picture if no user is logged in
+        team_members = []  # Default empty list for team
+        clients = []  # Default empty list for clients
+        
+        # If the user is logged in, fetch the user data
+        if current_user.is_authenticated:
+            current_user_data = current_user
+            user_role = current_user.role
+            is_premium = current_user.premium
+            membership_status = current_user.membership_status
+            profile_picture = current_user.profile_picture or "default-profile-picture.jpg"  # Use default if no profile picture is set
+
+            # Add users to "team" section if the user is an owner
+            if user_role == 'owner':
+                team_members = [
+                    {'name': 'Parveen Anand', 'role': 'Lead Designer', 'img': 'assets/img/team/1.jpg'},
+                    {'name': 'Diana Petersen', 'role': 'Lead Marketer', 'img': 'assets/img/team/2.jpg'},
+                    {'name': 'Larry Parker', 'role': 'Lead Developer', 'img': 'assets/img/team/3.jpg'}
+                ]
+            # Add logos to "clients" section if the user is a seller
+            if user_role == 'seller':
+                clients = [
+                    {'logo': 'assets/img/logos/microsoft.svg', 'link': '#!'},
+                    {'logo': 'assets/img/logos/google.svg', 'link': '#!'},
+                    {'logo': 'assets/img/logos/facebook.svg', 'link': '#!'},
+                    {'logo': 'assets/img/logos/ibm.svg', 'link': '#!'}
+                ]
+
+        # Render the page for all users (logged in or not)
+        return render_template('index.html', 
+                               current_user=current_user_data, 
+                               user_role=user_role,
+                               is_premium=is_premium, 
+                               membership_status=membership_status, 
+                               profile_picture=profile_picture,
+                               team_members=team_members,  # Pass team members data
+                               clients=clients)  # Pass clients data
+
     except Exception as e:
-        app.logger.error(f"Error rendering template: {e}")
+        app.logger.error(f"Error rendering index page: {e}")
         return "An error occurred while rendering the page.", 500
+
+
+
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():

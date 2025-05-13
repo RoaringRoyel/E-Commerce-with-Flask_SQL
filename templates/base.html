@@ -1,207 +1,80 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>My E-commerce Platform</title>
+    <title>{% block title %}My Marketplace{% endblock %}</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        /* Glassmorphism Background */
+        body {
+            background: url('{{ url_for('static', filename='images/bg.jpg') }}') no-repeat center center fixed;
+            background-size: cover;
+            font-family: 'Segoe UI', sans-serif;
+        }
 
-    <!-- Bootstrap for styling -->
-    <link href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" rel="stylesheet">
+        .glass-container {
+            backdrop-filter: blur(10px);
+            background: rgba(255, 255, 255, 0.1);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 15px;
+            padding: 20px;
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.2);
+        }
 
-    <!-- Custom CSS (optional) -->
-    <link rel="stylesheet" href="{{ url_for('static', filename='assets/css/style.css') }}">
+        nav.navbar {
+            backdrop-filter: blur(8px);
+            background: rgba(255, 255, 255, 0.2);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+        }
 
-    <!-- FontAwesome for icons (optional) -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css">
-    <!-- Add inside <head> -->
-<link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+        .nav-link {
+            color: #fff !important;
+            font-weight: 500;
+        }
 
-<!-- Before closing </body> -->
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-
+        .nav-link:hover {
+            text-decoration: underline;
+        }
+    </style>
+    {% block head %}{% endblock %}
 </head>
-
 <body>
-    <!-- Navigation Bar -->
-    <nav class="navbar navbar-expand-lg navbar-light bg-light">
-        <div class="container">
-            <a class="navbar-brand" href="/">E-Commerce</a>
-            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
-                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ml-auto">
-                    <li class="nav-item">
-                        <a class="nav-link" href="/">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/products">Products</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/cart">Cart</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/wishlist">Wishlist</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="/profile">Profile</a>
-                    </li>
-                    {% if current_user.is_authenticated %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="/logout">Logout</a>
-                    </li>
-                    {% else %}
-                    <li class="nav-item">
-                        <a class="nav-link" href="/login">Login</a>
-                    </li>
+
+<!-- Navbar -->
+<nav class="navbar navbar-expand-lg navbar-dark">
+    <div class="container-fluid">
+        <a class="navbar-brand text-white" href="{{ url_for('all_products') }}">MyMarketplace</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse justify-content-end" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item"><a class="nav-link" href="{{ url_for('all_products') }}">All Products</a></li>
+                {% if current_user.is_authenticated %}
+                    {% if current_user.role == 'owner' %}
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('admin_dashboard') }}">Admin Dashboard</a></li>
+                    {% elif current_user.role == 'seller' %}
+                        <li class="nav-item"><a class="nav-link" href="{{ url_for('seller_dashboard') }}">Seller Dashboard</a></li>
                     {% endif %}
-                </ul>
-            </div>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('auction_page') }}">Auction</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('logout') }}">Logout</a></li>
+                {% else %}
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('login') }}">Login</a></li>
+                    <li class="nav-item"><a class="nav-link" href="{{ url_for('register') }}">Register</a></li>
+                {% endif %}
+            </ul>
         </div>
-    </nav>
-
-    <!-- Main Content Area -->
-    <div class="container my-4">
-        {% block content %}
-        <!-- Content will be injected here by child templates -->
-        {% endblock %}
     </div>
+</nav>
 
-    <!-- Footer -->
-    <footer class="bg-light text-center py-4">
-        <p>&copy; 2025 My E-Commerce Platform. All rights reserved.</p>
-    </footer>
+<!-- Page Content -->
+<div class="container my-5">
+    <div class="glass-container">
+        {% block content %}{% endblock %}
+    </div>
+</div>
 
-    <!-- JavaScript libraries (optional) -->
-    <script src="https://code.jquery.com/jquery-3.5.1.slim.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@popperjs/core@2.5.2/dist/umd/popper.min.js"></script>
-    <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js"></script>
-
-    <!-- Custom JS (optional) -->
-    <script src="{{ url_for('static', filename='assets/js/script.js') }}"></script>
-
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+{% block scripts %}{% endblock %}
 </body>
-<style>
-    @import url("https://fonts.googleapis.com/css2?family=Open+Sans:wght@200;300;400;500;600;700&display=swap");
-
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-      font-family: "Open Sans", sans-serif;
-    }
-
-    /* Remove flexbox on body */
-    body {
-      padding: 0 10px;
-      background: url("{{ url_for('static', filename='hero-bg.jpg') }}") no-repeat center center fixed;
-      background-position: center;
-      background-size: cover;
-    }
-
-    /* Navigation Styles */
-    nav.navbar {
-      position: relative;
-      z-index: 10;
-    }
-
-    /* Main Content Area */
-    .container.my-4 {
-      position: relative;
-      z-index: 5; /* To make sure content appears above background */
-    }
-
-    .product-detail-wrapper {
-      width: 100%;
-      max-width: 900px;
-      padding: 40px;
-      border-radius: 10px;
-      text-align: center;
-      backdrop-filter: blur(12px);
-      -webkit-backdrop-filter: blur(12px);
-      border: 1px solid rgba(255, 255, 255, 0.4);
-      background: rgba(255, 255, 255, 0.2);
-      color: #fff;
-    }
-
-    .product-detail {
-      padding: 20px;
-    }
-
-    .product-image-container {
-      margin-bottom: 20px;
-    }
-
-    .product-image {
-      max-width: 100%;
-      height: auto;
-      border-radius: 8px;
-    }
-
-    h1 {
-      font-size: 2.5rem;
-      color: #fff;
-      margin-bottom: 20px;
-    }
-
-    p {
-      font-size: 1.1rem;
-      margin-bottom: 10px;
-    }
-
-    button {
-      background: #fff;
-      color: #000;
-      font-weight: 600;
-      border: none;
-      padding: 12px 20px;
-      cursor: pointer;
-      border-radius: 3px;
-      font-size: 16px;
-      border: 2px solid transparent;
-      transition: 0.3s ease;
-      margin: 10px;
-    }
-
-    button:hover {
-      color: #fff;
-      border-color: #fff;
-      background: rgba(255, 255, 255, 0.15);
-    }
-
-    .seller-specific {
-      margin-top: 30px;
-    }
-
-    .product-report {
-      margin-top: 20px;
-      text-align: left;
-    }
-
-    .report-stats p,
-    .report-stats ul {
-      font-size: 1rem;
-      color: #fff;
-    }
-
-    .product-report h3 {
-      color: #fff;
-      margin-bottom: 10px;
-    }
-
-    .product-report h4 {
-      margin-top: 15px;
-      color: #fff;
-    }
-
-    .product-report ul {
-      list-style-type: none;
-      padding-left: 0;
-    }
-</style>
-
-  
 </html>
