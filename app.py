@@ -526,6 +526,7 @@ def product_detail(product_id):
             flash('Your review has been submitted!', 'success')
         else:
             flash('You can only review products you have purchased.', 'danger')
+        
         return redirect(url_for('product_detail', product_id=product.id))
 
     # Handle seller-specific actions
@@ -559,6 +560,15 @@ def product_detail(product_id):
         # Calculate the average rating
         if ratings:
             avg_rating = sum(ratings) / len(ratings)
+    # Check if user is eligible to review this product
+    eligible_to_review = False
+    if current_user.is_authenticated:
+        user_orders = Order.query.filter_by(buyer_id=current_user.id, status='delivered').all()
+        for order in user_orders:
+            order_items = OrderItem.query.filter_by(order_id=order.id, product_id=product.id).first()
+            if order_items:
+                eligible_to_review = True
+                break
 
     return render_template('product_detail.html', 
                            product=product, 
@@ -567,7 +577,20 @@ def product_detail(product_id):
                            avg_rating=avg_rating, 
                            total_sales=total_sales, 
                            orders=orders, 
-                           current_user=current_user)
+                           current_user=current_user,
+                           eligible_to_review=eligible_to_review)
+@app.route('/submit_review/<int:product_id>', methods=['POST'])
+@login_required
+def submit_review(product_id):
+    rating = int(request.form['rating'])
+    comment = request.form['comment']
+
+    review = Review(user_id=current_user.id, product_id=product_id, rating=rating, comment=comment)
+    db.session.add(review)
+    db.session.commit()
+
+    flash('Review submitted successfully!', 'success')
+    return redirect(url_for('product_detail', product_id=product_id))
 
 
 @app.route('/product/<int:product_id>/request_to_warehouse', methods=['POST'])
